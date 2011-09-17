@@ -56,18 +56,18 @@ public class AMsgHandler extends BaseHandler
 
             for (Conversation currentConversation : mConversations) {
                 if (currentConversation.getType() == Conversation.TYPE_CHANNEL) {
-                    Message message = new Message("<" + service.getConnection(server.getId()).getNick() + "> " + text);
+                    Message message = new Message("<" + service.getConnection().getNick() + "> " + text);
                     currentConversation.addMessage(message);
 
                     Intent intent = Broadcast.createConversationIntent(
                         Broadcast.CONVERSATION_MESSAGE,
                         server.getId(),
                         currentConversation.getName()
-                    );
+                        );
 
                     service.sendBroadcast(intent);
 
-                    service.getConnection(server.getId()).sendMessage(currentConversation.getName(), text);
+                    service.getConnection().sendMessage(currentConversation.getName(), text);
                 }
             }
         } else {

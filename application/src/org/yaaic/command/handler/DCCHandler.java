@@ -57,7 +57,7 @@ public class DCCHandler extends BaseHandler
                 throw new CommandException(service.getString(R.string.dcc_file_not_found, params[3]));
             }
 
-            service.getConnection(server.getId()).dccSendFile(file, params[2], 60000);
+            service.getConnection().dccSendFile(file, params[2], 60000);
 
             Message message = new Message(service.getString(R.string.dcc_waiting_accept, params[2]));
             message.setColor(Message.COLOR_GREY);
@@ -65,7 +65,7 @@ public class DCCHandler extends BaseHandler
 
             service.sendBroadcast(
                 Broadcast.createConversationIntent(Broadcast.CONVERSATION_MESSAGE, server.getId(), conversation.getName())
-            );
+                );
         } else {
             throw new CommandException(service.getString(R.string.invalid_number_of_params));
         }

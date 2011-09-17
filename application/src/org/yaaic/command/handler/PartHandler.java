@@ -49,9 +49,9 @@ public class PartHandler extends BaseHandler
                 throw new CommandException(service.getString(R.string.only_usable_from_channel));
             }
 
-            service.getConnection(server.getId()).partChannel(conversation.getName());
+            service.getConnection().partChannel(conversation.getName());
         } else if (params.length == 2) {
-            service.getConnection(server.getId()).partChannel(params[1]);
+            service.getConnection().partChannel(params[1]);
         } else {
             throw new CommandException(service.getString(R.string.invalid_number_of_params));
         }

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+Yaaic - Yet Another Android IRC Client
+
+Copyright 2009-2011 Sebastian Kaspari
+
+This file is part of Yaaic.
+
+Yaaic is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Yaaic is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Yaaic.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" android:weightSum="1">
+    <!-- 
+    	<ListView
+        android:id="@android:id/list"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" />
+     -->
+    <RelativeLayout android:id="@+id/relativeLayout1" android:layout_width="match_parent" android:layout_height="match_parent" android:gravity="fill_vertical">
+        <LinearLayout android:layout_height="wrap_content" android:id="@+id/linearLayout2" android:orientation="vertical" android:layout_alignParentTop="true" android:layout_centerHorizontal="true" android:layout_marginTop="109dp" android:layout_width="match_parent">
+            <TextView android:id="@+id/username_label" android:textAppearance="?android:attr/textAppearanceMedium" android:layout_height="wrap_content" android:layout_width="wrap_content" android:text="TextView"></TextView>
+            <EditText android:layout_height="wrap_content" android:id="@+id/username" android:layout_width="match_parent"></EditText>
+            <TextView android:id="@+id/password_label" android:textAppearance="?android:attr/textAppearanceMedium" android:layout_height="wrap_content" android:layout_width="wrap_content" android:text="TextView"></TextView>
+            <EditText android:layout_height="wrap_content" android:id="@+id/password" android:layout_width="match_parent">
+                <requestFocus></requestFocus>
+            </EditText>
+        </LinearLayout>
+        <CheckBox android:id="@+id/checkBox1" android:layout_height="wrap_content" android:text="CheckBox" android:layout_width="wrap_content" android:layout_below="@+id/linearLayout2" android:layout_alignParentLeft="true" android:layout_marginTop="81dp"></CheckBox>
+    </RelativeLayout>
+    <LinearLayout android:layout_height="wrap_content" android:id="@+id/linearLayout1" android:layout_alignParentBottom="true" android:layout_centerHorizontal="true" android:layout_marginBottom="32dp" android:layout_width="match_parent" android:gravity="bottom">
+        <Button android:layout_weight="1" android:id="@+id/connect_button" android:layout_height="wrap_content" android:text="Button" android:layout_width="0dp"></Button>
+        <Button android:layout_weight="1" android:id="@+id/exit_button" android:layout_height="wrap_content" android:text="Button" android:layout_width="0dp"></Button>
+    </LinearLayout>
+</LinearLayout>

@@ -33,12 +33,13 @@ import org.yaaic.R;
  */
 public class Server
 {
-    private int id;
-    private String title;
-    private String host;
-    private int port;
-    private String password;
-    private String charset;
+    private int id = 0;
+    private String title = "Onet Czaty";
+    private String host = "czat-app.onet.pl";
+    private int port = 5015;
+    private String password = "";
+    private String uoKey = "";
+    private String charset = "";
     private boolean useSSL = false;
 
     private Identity identity;
@@ -130,6 +131,16 @@ public class Server
     public void setPassword(String password)
     {
         this.password = password;
+    }
+
+    public void setUOKey(String uoKey)
+    {
+        this.uoKey = uoKey;
+    }
+
+    public String getUOKey()
+    {
+        return this.uoKey;
     }
 
     /**

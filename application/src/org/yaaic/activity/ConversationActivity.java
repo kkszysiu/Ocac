@@ -75,9 +75,9 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnKeyListener;
 import android.view.Window;
 import android.view.WindowManager;
-import android.view.View.OnKeyListener;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -180,7 +180,7 @@ public class ConversationActivity extends Activity implements ServiceConnection,
         requestWindowFeature(Window.FEATURE_NO_TITLE);
 
         serverId = getIntent().getExtras().getInt("serverId");
-        server = Yaaic.getInstance().getServerById(serverId);
+        server = Yaaic.getInstance().getServer();
         Settings settings = new Settings(this);
 
         // Finish activity if server does not exist anymore - See #55
@@ -351,7 +351,7 @@ public class ConversationActivity extends Activity implements ServiceConnection,
             new Thread() {
                 @Override
                 public void run() {
-                    binder.getService().getConnection(serverId).joinChannel(joinChannelBuffer);
+                    binder.getService().getConnection().joinChannel(joinChannelBuffer);
                     joinChannelBuffer = null;
                 }
             }.start();
@@ -470,7 +470,7 @@ public class ConversationActivity extends Activity implements ServiceConnection,
             case R.id.disconnect:
                 server.setStatus(Status.DISCONNECTED);
                 server.setMayReconnect(false);
-                binder.getService().getConnection(serverId).quitServer();
+                binder.getService().getConnection().quitServer();
                 server.clearConversations();
                 setResult(RESULT_OK);
                 finish();
@@ -480,7 +480,7 @@ public class ConversationActivity extends Activity implements ServiceConnection,
                 Conversation conversationToClose = deckAdapter.getItem(deck.getSelectedItemPosition());
                 // Make sure we part a channel when closing the channel conversation
                 if (conversationToClose.getType() == Conversation.TYPE_CHANNEL) {
-                    binder.getService().getConnection(serverId).partChannel(conversationToClose.getName());
+                    binder.getService().getConnection().partChannel(conversationToClose.getName());
                 }
                 else if (conversationToClose.getType() == Conversation.TYPE_QUERY) {
                     server.removeConversation(conversationToClose.getName());
@@ -500,10 +500,10 @@ public class ConversationActivity extends Activity implements ServiceConnection,
                     Intent intent = new Intent(this, UsersActivity.class);
                     intent.putExtra(
                         Extra.USERS,
-                        binder.getService().getConnection(server.getId()).getUsersAsStringArray(
+                        binder.getService().getConnection().getUsersAsStringArray(
                             conversationForUserList.getName()
-                        )
-                    );
+                            )
+                        );
                     startActivityForResult(intent, REQUEST_CODE_USERS);
                 } else {
                     Toast.makeText(this, getResources().getString(R.string.only_usable_from_channel), Toast.LENGTH_SHORT).show();
@@ -602,6 +602,7 @@ public class ConversationActivity extends Activity implements ServiceConnection,
     /**
      * On topic change
      */
+    @Override
     public void onTopicChanged(String target)
     {
         String selected = server.getSelectedConversation();
@@ -653,9 +654,9 @@ public class ConversationActivity extends Activity implements ServiceConnection,
                             reconnectDialogActive = false;
                             return;
                         }
-                        binder.getService().getConnection(server.getId()).setAutojoinChannels(
+                        binder.getService().getConnection().setAutojoinChannels(
                             server.getCurrentChannelNames()
-                        );
+                            );
                         server.setStatus(Status.CONNECTING);
                         binder.connect(server);
                         reconnectDialogActive = false;
@@ -726,7 +727,7 @@ public class ConversationActivity extends Activity implements ServiceConnection,
             case REQUEST_CODE_USER:
                 final int actionId = data.getExtras().getInt(Extra.ACTION);
                 final String nickname = data.getExtras().getString(Extra.USER);
-                final IRCConnection connection = binder.getService().getConnection(server.getId());
+                final IRCConnection connection = binder.getService().getConnection();
                 final String conversation = server.getSelectedConversation();
                 final Handler handler = new Handler();
 
@@ -750,7 +751,7 @@ public class ConversationActivity extends Activity implements ServiceConnection,
                             nicknameWithoutPrefix.startsWith("+") ||
                             nicknameWithoutPrefix.startsWith(".") ||
                             nicknameWithoutPrefix.startsWith("%")
-                        ) {
+                            ) {
                             // Strip prefix(es) now
                             nicknameWithoutPrefix = nicknameWithoutPrefix.substring(1);
                         }
@@ -779,7 +780,7 @@ public class ConversationActivity extends Activity implements ServiceConnection,
                                         Broadcast.CONVERSATION_NEW,
                                         server.getId(),
                                         nicknameWithoutPrefix
-                                    );
+                                        );
                                     binder.getService().sendBroadcast(intent);
                                 }
                                 break;
@@ -835,10 +836,10 @@ public class ConversationActivity extends Activity implements ServiceConnection,
         if (conversation != null) {
             if (!text.trim().startsWith("/")) {
                 if (conversation.getType() != Conversation.TYPE_SERVER) {
-                    String nickname = binder.getService().getConnection(serverId).getNick();
+                    String nickname = binder.getService().getConnection().getNick();
                     //conversation.addMessage(new Message("<" + nickname + "> " + text));
                     conversation.addMessage(new Message(text, nickname));
-                    binder.getService().getConnection(serverId).sendMessage(conversation.getName(), text);
+                    binder.getService().getConnection().sendMessage(conversation.getName(), text);
                 } else {
                     Message message = new Message(getString(R.string.chat_only_form_channel));
                     message.setColor(Message.COLOR_YELLOW);
@@ -912,9 +913,9 @@ public class ConversationActivity extends Activity implements ServiceConnection,
         String[] users = null;
 
         if (conversationForUserList.getType() == Conversation.TYPE_CHANNEL) {
-            users = binder.getService().getConnection(server.getId()).getUsersAsStringArray(
+            users = binder.getService().getConnection().getUsersAsStringArray(
                 conversationForUserList.getName()
-            );
+                );
         }
 
         // go through users and add matches

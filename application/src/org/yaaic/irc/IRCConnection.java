@@ -65,9 +65,9 @@ public class IRCConnection extends PircBot
      * @param service
      * @param serverId
      */
-    public IRCConnection(IRCService service, int serverId)
+    public IRCConnection(IRCService service)
     {
-        this.server = Yaaic.getInstance().getServerById(serverId);
+        this.server = Yaaic.getInstance().getServer();
         this.service = service;
 
         // XXX: Should be configurable via settings
@@ -120,9 +120,9 @@ public class IRCConnection extends PircBot
     {
         this.sendRawLine(
             "NOTICE " + sourceNick + " :\u0001VERSION " +
-            "Yaaic - Yet another Android IRC client - http://www.yaaic.org" +
-            "\u0001"
-        );
+                "Yaaic - Yet another Android IRC client - http://www.yaaic.org" +
+                "\u0001"
+            );
     }
 
     /**
@@ -142,14 +142,14 @@ public class IRCConnection extends PircBot
     public void onConnect()
     {
         server.setStatus(Status.CONNECTED);
-        
+
         server.setMayReconnect(true);
 
         ignoreMOTD = service.getSettings().isIgnoreMOTDEnabled();
 
         service.sendBroadcast(
             Broadcast.createServerIntent(Broadcast.SERVER_UPDATE, server.getId())
-        );
+            );
 
         service.notifyConnected(server.getTitle());
 
@@ -165,11 +165,11 @@ public class IRCConnection extends PircBot
             Broadcast.CONVERSATION_MESSAGE,
             server.getId(),
             ServerInfo.DEFAULT_NAME
-        );
+            );
 
-        if (server.getAuthentication().hasNickservCredentials()) {
-            identify(server.getAuthentication().getNickservPassword());
-        }
+        //if (server.getAuthentication().hasNickservCredentials()) {
+        //    identify(server.getAuthentication().getNickservPassword());
+        //}
 
         service.sendBroadcast(intent);
     }
@@ -222,7 +222,7 @@ public class IRCConnection extends PircBot
             Broadcast.CONVERSATION_MESSAGE,
             server.getId(),
             ServerInfo.DEFAULT_NAME
-        );
+            );
 
         service.sendBroadcast(intent);
     }
@@ -255,7 +255,7 @@ public class IRCConnection extends PircBot
                 Broadcast.CONVERSATION_NEW,
                 server.getId(),
                 queryNick
-            );
+                );
             service.sendBroadcast(intent);
         } else {
             conversation.addMessage(message);
@@ -264,7 +264,7 @@ public class IRCConnection extends PircBot
                 Broadcast.CONVERSATION_MESSAGE,
                 server.getId(),
                 queryNick
-            );
+                );
             service.sendBroadcast(intent);
         }
 
@@ -282,7 +282,7 @@ public class IRCConnection extends PircBot
                     conversation.getName() + ": " + sender + " " + action,
                     service.getSettings().isVibrateHighlightEnabled(),
                     service.getSettings().isSoundHighlightEnabled()
-                );
+                    );
             }
         }
 
@@ -316,7 +316,7 @@ public class IRCConnection extends PircBot
             Broadcast.CONVERSATION_MESSAGE,
             server.getId(),
             target
-        );
+            );
 
         service.sendBroadcast(intent);
     }
@@ -336,7 +336,7 @@ public class IRCConnection extends PircBot
             Broadcast.CONVERSATION_MESSAGE,
             server.getId(),
             target
-        );
+            );
 
         service.sendBroadcast(intent);
     }
@@ -356,7 +356,7 @@ public class IRCConnection extends PircBot
                 Broadcast.CONVERSATION_MESSAGE,
                 server.getId(),
                 server.getSelectedConversation()
-            );
+                );
             service.sendBroadcast(intent);
         } else {
             // Someone is invited
@@ -367,7 +367,7 @@ public class IRCConnection extends PircBot
                 Broadcast.CONVERSATION_MESSAGE,
                 server.getId(),
                 target
-            );
+                );
             service.sendBroadcast(intent);
         }
     }
@@ -388,13 +388,13 @@ public class IRCConnection extends PircBot
                 Broadcast.CONVERSATION_NEW,
                 server.getId(),
                 target
-            );
+                );
             service.sendBroadcast(intent);
         } else if (service.getSettings().showJoinPartAndQuit()) {
             Message message = new Message(
                 service.getString(R.string.message_join, sender),
                 Message.TYPE_MISC
-            );
+                );
 
             message.setIcon(R.drawable.join);
             message.setColor(Message.COLOR_GREEN);
@@ -404,7 +404,7 @@ public class IRCConnection extends PircBot
                 Broadcast.CONVERSATION_MESSAGE,
                 server.getId(),
                 target
-            );
+                );
             service.sendBroadcast(intent);
         }
     }
@@ -424,7 +424,7 @@ public class IRCConnection extends PircBot
                 Broadcast.CONVERSATION_REMOVE,
                 server.getId(),
                 target
-            );
+                );
             service.sendBroadcast(intent);
         } else {
             Message message = new Message(service.getString(R.string.message_kick, kickerNick, recipientNick));
@@ -435,7 +435,7 @@ public class IRCConnection extends PircBot
                 Broadcast.CONVERSATION_MESSAGE,
                 server.getId(),
                 target
-            );
+                );
             service.sendBroadcast(intent);
         }
     }
@@ -459,7 +459,7 @@ public class IRCConnection extends PircBot
                     target + ": <" + sender + "> " + text,
                     service.getSettings().isVibrateHighlightEnabled(),
                     service.getSettings().isSoundHighlightEnabled()
-                );
+                    );
             }
 
             conversation.setStatus(Conversation.STATUS_HIGHLIGHT);
@@ -471,7 +471,7 @@ public class IRCConnection extends PircBot
             Broadcast.CONVERSATION_MESSAGE,
             server.getId(),
             target
-        );
+            );
         service.sendBroadcast(intent);
     }
 
@@ -512,7 +512,7 @@ public class IRCConnection extends PircBot
                 Broadcast.CONVERSATION_MESSAGE,
                 server.getId(),
                 ServerInfo.DEFAULT_NAME
-            );
+                );
 
             service.sendBroadcast(intent);
         }
@@ -528,7 +528,7 @@ public class IRCConnection extends PircBot
                 Broadcast.CONVERSATION_MESSAGE,
                 server.getId(),
                 target
-            );
+                );
             service.sendBroadcast(intent);
         }
     }
@@ -561,7 +561,7 @@ public class IRCConnection extends PircBot
             Broadcast.CONVERSATION_MESSAGE,
             server.getId(),
             conversation.getName()
-        );
+            );
         service.sendBroadcast(intent);
     }
 
@@ -580,7 +580,7 @@ public class IRCConnection extends PircBot
             Broadcast.CONVERSATION_MESSAGE,
             server.getId(),
             target
-        );
+            );
         service.sendBroadcast(intent);
     }
 
@@ -599,13 +599,13 @@ public class IRCConnection extends PircBot
                 Broadcast.CONVERSATION_REMOVE,
                 server.getId(),
                 target
-            );
+                );
             service.sendBroadcast(intent);
         } else if (service.getSettings().showJoinPartAndQuit()) {
             Message message = new Message(
                 service.getString(R.string.message_part, sender),
                 Message.TYPE_MISC
-            );
+                );
 
             message.setColor(Message.COLOR_GREEN);
             message.setIcon(R.drawable.part);
@@ -615,7 +615,7 @@ public class IRCConnection extends PircBot
                 Broadcast.CONVERSATION_MESSAGE,
                 server.getId(),
                 target
-            );
+                );
             service.sendBroadcast(intent);
         }
     }
@@ -645,7 +645,7 @@ public class IRCConnection extends PircBot
                 Broadcast.CONVERSATION_NEW,
                 server.getId(),
                 queryNick
-            );
+                );
             service.sendBroadcast(intent);
         } else {
             conversation.addMessage(message);
@@ -654,7 +654,7 @@ public class IRCConnection extends PircBot
                 Broadcast.CONVERSATION_MESSAGE,
                 server.getId(),
                 queryNick
-            );
+                );
             service.sendBroadcast(intent);
         }
 
@@ -670,7 +670,7 @@ public class IRCConnection extends PircBot
                 "<" + sender + "> " + text,
                 service.getSettings().isVibrateHighlightEnabled(),
                 service.getSettings().isSoundHighlightEnabled()
-            );
+                );
         }
 
         if (isMentioned(text)) {
@@ -696,7 +696,7 @@ public class IRCConnection extends PircBot
                 Message message = new Message(
                     service.getString(R.string.message_quit, sourceNick, reason),
                     Message.TYPE_MISC
-                );
+                    );
 
                 message.setColor(Message.COLOR_GREEN);
                 message.setIcon(R.drawable.quit);
@@ -706,7 +706,7 @@ public class IRCConnection extends PircBot
                     Broadcast.CONVERSATION_MESSAGE,
                     server.getId(),
                     target
-                );
+                    );
                 service.sendBroadcast(intent);
             }
 
@@ -717,7 +717,7 @@ public class IRCConnection extends PircBot
                 Message message = new Message(
                     service.getString(R.string.message_quit, sourceNick, reason),
                     Message.TYPE_MISC
-                );
+                    );
 
                 message.setColor(Message.COLOR_GREEN);
                 message.setIcon(R.drawable.quit);
@@ -727,7 +727,7 @@ public class IRCConnection extends PircBot
                     Broadcast.CONVERSATION_MESSAGE,
                     server.getId(),
                     conversation.getName()
-                );
+                    );
                 service.sendBroadcast(intent);
             }
         }
@@ -756,7 +756,7 @@ public class IRCConnection extends PircBot
             Broadcast.CONVERSATION_MESSAGE,
             server.getId(),
             target
-        );
+            );
         service.sendBroadcast(intent);
 
         // update the displayed conversation title if necessary
@@ -764,7 +764,7 @@ public class IRCConnection extends PircBot
             Broadcast.CONVERSATION_TOPIC,
             server.getId(),
             target
-        );
+            );
         service.sendBroadcast(intent);
     }
 
@@ -792,7 +792,7 @@ public class IRCConnection extends PircBot
             Broadcast.CONVERSATION_MESSAGE,
             server.getId(),
             target
-        );
+            );
         service.sendBroadcast(intent);
     }
 
@@ -808,7 +808,7 @@ public class IRCConnection extends PircBot
 
         service.sendBroadcast(
             Broadcast.createConversationIntent(Broadcast.CONVERSATION_MESSAGE, server.getId(), target)
-        );
+            );
     }
 
     /**
@@ -823,7 +823,7 @@ public class IRCConnection extends PircBot
 
         service.sendBroadcast(
             Broadcast.createConversationIntent(Broadcast.CONVERSATION_MESSAGE, server.getId(), target)
-        );
+            );
     }
 
     /**
@@ -838,7 +838,7 @@ public class IRCConnection extends PircBot
 
         service.sendBroadcast(
             Broadcast.createConversationIntent(Broadcast.CONVERSATION_MESSAGE, server.getId(), target)
-        );
+            );
     }
 
     /**
@@ -853,7 +853,7 @@ public class IRCConnection extends PircBot
 
         service.sendBroadcast(
             Broadcast.createConversationIntent(Broadcast.CONVERSATION_MESSAGE, server.getId(), target)
-        );
+            );
     }
 
     /**
@@ -868,7 +868,7 @@ public class IRCConnection extends PircBot
 
         service.sendBroadcast(
             Broadcast.createConversationIntent(Broadcast.CONVERSATION_MESSAGE, server.getId(), target)
-        );
+            );
     }
 
     /**
@@ -883,7 +883,7 @@ public class IRCConnection extends PircBot
 
         service.sendBroadcast(
             Broadcast.createConversationIntent(Broadcast.CONVERSATION_MESSAGE, server.getId(), target)
-        );
+            );
     }
 
     /**
@@ -898,7 +898,7 @@ public class IRCConnection extends PircBot
 
         service.sendBroadcast(
             Broadcast.createConversationIntent(Broadcast.CONVERSATION_MESSAGE, server.getId(), target)
-        );
+            );
     }
 
     /**
@@ -913,7 +913,7 @@ public class IRCConnection extends PircBot
 
         service.sendBroadcast(
             Broadcast.createConversationIntent(Broadcast.CONVERSATION_MESSAGE, server.getId(), target)
-        );
+            );
     }
 
     /**
@@ -928,7 +928,7 @@ public class IRCConnection extends PircBot
 
         service.sendBroadcast(
             Broadcast.createConversationIntent(Broadcast.CONVERSATION_MESSAGE, server.getId(), target)
-        );
+            );
     }
 
     /**
@@ -943,7 +943,7 @@ public class IRCConnection extends PircBot
 
         service.sendBroadcast(
             Broadcast.createConversationIntent(Broadcast.CONVERSATION_MESSAGE, server.getId(), target)
-        );
+            );
     }
 
     /**
@@ -958,7 +958,7 @@ public class IRCConnection extends PircBot
 
         service.sendBroadcast(
             Broadcast.createConversationIntent(Broadcast.CONVERSATION_MESSAGE, server.getId(), target)
-        );
+            );
     }
 
     /**
@@ -973,7 +973,7 @@ public class IRCConnection extends PircBot
 
         service.sendBroadcast(
             Broadcast.createConversationIntent(Broadcast.CONVERSATION_MESSAGE, server.getId(), target)
-        );
+            );
     }
 
     /**
@@ -988,7 +988,7 @@ public class IRCConnection extends PircBot
 
         service.sendBroadcast(
             Broadcast.createConversationIntent(Broadcast.CONVERSATION_MESSAGE, server.getId(), target)
-        );
+            );
     }
 
     /**
@@ -1003,7 +1003,7 @@ public class IRCConnection extends PircBot
 
         service.sendBroadcast(
             Broadcast.createConversationIntent(Broadcast.CONVERSATION_MESSAGE, server.getId(), target)
-        );
+            );
     }
 
     /**
@@ -1018,7 +1018,7 @@ public class IRCConnection extends PircBot
 
         service.sendBroadcast(
             Broadcast.createConversationIntent(Broadcast.CONVERSATION_MESSAGE, server.getId(), target)
-        );
+            );
     }
 
     /**
@@ -1033,7 +1033,7 @@ public class IRCConnection extends PircBot
 
         service.sendBroadcast(
             Broadcast.createConversationIntent(Broadcast.CONVERSATION_MESSAGE, server.getId(), target)
-        );
+            );
     }
 
     /**
@@ -1048,7 +1048,7 @@ public class IRCConnection extends PircBot
 
         service.sendBroadcast(
             Broadcast.createConversationIntent(Broadcast.CONVERSATION_MESSAGE, server.getId(), target)
-        );
+            );
     }
 
     /**
@@ -1063,7 +1063,7 @@ public class IRCConnection extends PircBot
 
         service.sendBroadcast(
             Broadcast.createConversationIntent(Broadcast.CONVERSATION_MESSAGE, server.getId(), target)
-        );
+            );
     }
 
     /**
@@ -1081,7 +1081,7 @@ public class IRCConnection extends PircBot
             Broadcast.CONVERSATION_MESSAGE,
             server.getId(),
             ServerInfo.DEFAULT_NAME
-        );
+            );
         service.sendBroadcast(intent);
     }
 
@@ -1130,7 +1130,7 @@ public class IRCConnection extends PircBot
             Broadcast.CONVERSATION_MESSAGE,
             server.getId(),
             ServerInfo.DEFAULT_NAME
-        );
+            );
         service.sendBroadcast(intent);
     }
 
@@ -1169,7 +1169,7 @@ public class IRCConnection extends PircBot
                 Broadcast.CONVERSATION_MESSAGE,
                 server.getId(),
                 conversation.getName()
-            );
+                );
             service.sendBroadcast(cIntent);
         }
 

@@ -43,9 +43,9 @@ public class JoinHandler extends BaseHandler
     public void execute(String[] params, Server server, Conversation conversation, IRCService service) throws CommandException
     {
         if (params.length == 2) {
-            service.getConnection(server.getId()).joinChannel(params[1]);
+            service.getConnection().joinChannel(params[1]);
         } else if (params.length == 3) {
-            service.getConnection(server.getId()).joinChannel(params[1], params[2]);
+            service.getConnection().joinChannel(params[1], params[2]);
         } else {
             throw new CommandException(service.getString(R.string.invalid_number_of_params));
         }

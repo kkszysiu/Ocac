@@ -20,6 +20,7 @@ along with Yaaic.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.yaaic.model;
 
+
 /**
  * Authentication credentials for a server.
  *
@@ -121,5 +122,9 @@ public class Authentication
     public String getNickservPassword()
     {
         return nickservPassword;
+    }
+
+    public boolean getOnetCzatToken() {
+        return false;
     }
 }

@@ -48,7 +48,7 @@ public class WhoisHandler extends BaseHandler
             throw new CommandException(service.getString(R.string.invalid_number_of_params));
         }
 
-        service.getConnection(server.getId()).sendRawLineViaQueue("WHOIS " + params[1]);
+        service.getConnection().sendRawLineViaQueue("WHOIS " + params[1]);
     }
 
     /**

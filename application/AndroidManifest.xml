@@ -27,7 +27,7 @@ along with Yaaic.  If not, see <http://www.gnu.org/licenses/>.
         android:icon="@drawable/icon"
         android:label="Yaaic">
         <activity
-            android:name=".activity.ServersActivity"
+            android:name=".activity.ServerActivity"
             android:label="@string/app_name"
             android:launchMode="standard">
             <intent-filter>

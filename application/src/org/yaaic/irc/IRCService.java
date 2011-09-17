@@ -25,16 +25,20 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.jibble.pircbot.IrcException;
 import org.jibble.pircbot.NickAlreadyInUseException;
 import org.yaaic.R;
 import org.yaaic.Yaaic;
-import org.yaaic.activity.ServersActivity;
-import org.yaaic.db.Database;
+import org.yaaic.activity.ServerActivity;
 import org.yaaic.model.Broadcast;
 import org.yaaic.model.Conversation;
+import org.yaaic.model.Identity;
 import org.yaaic.model.Message;
+import org.yaaic.model.OnetAuth;
 import org.yaaic.model.Server;
 import org.yaaic.model.ServerInfo;
 import org.yaaic.model.Settings;
@@ -46,9 +50,13 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.SystemClock;
+import android.util.Log;
+
+import com.loopj.android.http.AsyncHttpResponseHandler;
 
 /**
  * The background service for managing the irc connections
@@ -58,7 +66,8 @@ import android.os.SystemClock;
 public class IRCService extends Service
 {
     private final IRCBinder binder;
-    private final HashMap<Integer, IRCConnection> connections;
+    private IRCConnection connection;
+    //private final HashMap<Integer, IRCConnection> connections;
     private boolean foreground = false;
     private final ArrayList<String> connectedServerTitles;
     private final LinkedHashMap<String, Conversation> mentions;
@@ -89,6 +98,9 @@ public class IRCService extends Service
     private HashMap<Integer, ReconnectReceiver> alarmReceivers;
     private final Object alarmIntentsLock;
 
+    private static Context context;
+    //private static String uoKey;
+
     /**
      * Create new service
      */
@@ -96,7 +108,7 @@ public class IRCService extends Service
     {
         super();
 
-        this.connections = new HashMap<Integer, IRCConnection>();
+        //this.connections = new HashMap<Integer, IRCConnection>();
         this.binder = new IRCBinder(this);
         this.connectedServerTitles = new ArrayList<String>();
         this.mentions = new LinkedHashMap<String, Conversation>();
@@ -112,6 +124,7 @@ public class IRCService extends Service
     public void onCreate()
     {
         super.onCreate();
+        context = super.getApplicationContext();
 
         settings = new Settings(getBaseContext());
         notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
@@ -125,9 +138,9 @@ public class IRCService extends Service
         }
 
         // Load servers from Database
-        Database db = new Database(this);
-        Yaaic.getInstance().setServers(db.getServers());
-        db.close();
+        //Database db = new Database(this);
+        //Yaaic.getInstance().setServers(db.getServers());
+        //db.close();
 
         // Broadcast changed server list
         sendBroadcast(new Intent(Broadcast.SERVER_UPDATE));
@@ -162,6 +175,7 @@ public class IRCService extends Service
      * @param startId
      * @return
      */
+    @Override
     public int onStartCommand(Intent intent, int flags, int startId)
     {
         if (intent != null) {
@@ -192,7 +206,7 @@ public class IRCService extends Service
             notification = new Notification(R.drawable.icon, getText(R.string.notification_running), System.currentTimeMillis());
 
             // The PendingIntent to launch our activity if the user selects this notification
-            Intent notifyIntent = new Intent(this, ServersActivity.class);
+            Intent notifyIntent = new Intent(this, ServerActivity.class);
             notifyIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notifyIntent, 0);
 
@@ -219,7 +233,7 @@ public class IRCService extends Service
     {
         if (foreground) {
             notification = new Notification(R.drawable.icon, text, System.currentTimeMillis());
-            Intent notifyIntent = new Intent(this, ServersActivity.class);
+            Intent notifyIntent = new Intent(this, ServerActivity.class);
             notifyIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notifyIntent, 0);
 
@@ -394,13 +408,51 @@ public class IRCService extends Service
      */
     public void connect(final Server server)
     {
-        final int serverId = server.getId();
-        final int reconnectInterval = settings.getReconnectInterval()*60000;
-        final IRCService service = this;
 
         if (settings.isReconnectEnabled()) {
             server.setMayReconnect(true);
         }
+
+        List<String> fakeAliasesList = new ArrayList<String>();
+        fakeAliasesList.add("testerek");
+
+        server.setIdentity(new Identity());
+        server.getIdentity().setIdent("testerek");
+        server.getIdentity().setNickname("testerek");
+        server.getIdentity().setRealName("kkszysiu");
+        server.getIdentity().setAliases(fakeAliasesList);
+        server.setCharset("ISO8859-2");
+        server.setUseSSL(false);
+        OnetAuth.setOCUsername("testerek");
+        OnetAuth.setOCPassword("xxxxxx1");
+        OnetAuth.initialiseCookieStore(context);
+        OnetAuth.authoriseSession(new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(String response) {
+                Log.d("IRCService", "Auth final success: "+response.toString());
+                final Pattern PATTERN = Pattern.compile("<uoKey>(.*)</uoKey>", Pattern.DOTALL);
+                Matcher matcher = PATTERN.matcher(response);
+                if (matcher.find()) {
+                    String uoKey = matcher.group(1);
+                    Log.d("IRCService", "uoKey: "+uoKey);
+                    server.setUOKey(uoKey);
+                    openConnectionThread(server);
+                }
+
+
+            }
+            @Override
+            public void onFailure(Throwable e) {
+                // Response failed :(
+                Log.d("IRCService", "Auth onFailure: "+e.getMessage());
+            }
+        });
+    }
+
+    public void openConnectionThread(final Server server) {
+        final int serverId = 0;
+        final int reconnectInterval = settings.getReconnectInterval()*60000;
+        final IRCService service = this;
 
         new Thread("Connect thread for " + server.getTitle()) {
             @Override
@@ -418,7 +470,7 @@ public class IRCService extends Service
                 }
 
                 try {
-                    IRCConnection connection = getConnection(serverId);
+                    IRCConnection connection = getConnection();
 
                     connection.setNickname(server.getIdentity().getNickname());
                     connection.setAliases(server.getIdentity().getAliases());
@@ -426,16 +478,20 @@ public class IRCService extends Service
                     connection.setRealName(server.getIdentity().getRealName());
                     connection.setUseSSL(server.useSSL());
 
-                    if (server.getCharset() != null) {
-                        connection.setEncoding(server.getCharset());
+                    if (server.getUOKey() != "") {
+                        connection.setUOKey(server.getUOKey());
                     }
 
-                    if (server.getAuthentication().hasSaslCredentials()) {
-                        connection.setSaslCredentials(
-                            server.getAuthentication().getSaslUsername(),
-                            server.getAuthentication().getSaslPassword()
-                            );
-                    }
+                    //if (server.getCharset() != null) {
+                    //    connection.setEncoding(server.getCharset());
+                    //}
+
+                    //if (server.getAuthentication().hasSaslCredentials()) {
+                    //    connection.setSaslCredentials(
+                    //        server.getAuthentication().getSaslUsername(),
+                    //        server.getAuthentication().getSaslPassword()
+                    //        );
+                    //}
 
                     if (server.getPassword() != "") {
                         connection.connect(server.getHost(), server.getPort(), server.getPassword());
@@ -449,7 +505,7 @@ public class IRCService extends Service
                     Intent sIntent = Broadcast.createServerIntent(Broadcast.SERVER_UPDATE, serverId);
                     sendBroadcast(sIntent);
 
-                    IRCConnection connection = getConnection(serverId);
+                    IRCConnection connection = getConnection();
 
                     Message message;
 
@@ -496,13 +552,13 @@ public class IRCService extends Service
      * @param serverId
      * @return
      */
-    public synchronized IRCConnection getConnection(int serverId)
+    public synchronized IRCConnection getConnection()
     {
-        IRCConnection connection = connections.get(serverId);
+        //IRCConnection connection = connections.get(0);
 
         if (connection == null) {
-            connection = new IRCConnection(this, serverId);
-            connections.put(serverId, connection);
+            connection = new IRCConnection(this);
+            //connections.put(0, connection);
         }
 
         return connection;
@@ -515,7 +571,11 @@ public class IRCService extends Service
      */
     public boolean hasConnection(int serverId)
     {
-        return connections.containsKey(serverId);
+        //return connections.containsKey(serverId);
+        if (connection == null) {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -524,38 +584,33 @@ public class IRCService extends Service
     public void checkServiceStatus()
     {
         boolean shutDown = true;
-        ArrayList<Server> mServers = Yaaic.getInstance().getServersAsArrayList();
-        int mSize = mServers.size();
-        Server server;
+        Server server = Yaaic.getInstance().getServer();
 
-        for (int i = 0; i < mSize; i++) {
-            server = mServers.get(i);
-            if (server.isDisconnected() && !server.mayReconnect()) {
-                int serverId = server.getId();
-                synchronized(this) {
-                    IRCConnection connection = connections.get(serverId);
-                    if (connection != null) {
-                        connection.dispose();
-                    }
-                    connections.remove(serverId);
+        if (server.isDisconnected() && !server.mayReconnect()) {
+            int serverId = server.getId();
+            synchronized(this) {
+                //IRCConnection connection = connections.get(serverId);
+                if (connection != null) {
+                    connection.dispose();
                 }
-
-                synchronized(alarmIntentsLock) {
-                    PendingIntent pendingRIntent = alarmIntents.get(serverId);
-                    if (pendingRIntent != null) {
-                        AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
-                        am.cancel(pendingRIntent);
-                        alarmIntents.remove(serverId);
-                    }
-                    ReconnectReceiver receiver = alarmReceivers.get(serverId);
-                    if (receiver != null) {
-                        unregisterReceiver(receiver);
-                        alarmReceivers.remove(serverId);
-                    }
-                }
-            } else {
-                shutDown = false;
+                //connections.remove(serverId);
             }
+
+            synchronized(alarmIntentsLock) {
+                PendingIntent pendingRIntent = alarmIntents.get(serverId);
+                if (pendingRIntent != null) {
+                    AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
+                    am.cancel(pendingRIntent);
+                    alarmIntents.remove(serverId);
+                }
+                ReconnectReceiver receiver = alarmReceivers.get(serverId);
+                if (receiver != null) {
+                    unregisterReceiver(receiver);
+                    alarmReceivers.remove(serverId);
+                }
+            }
+        } else {
+            shutDown = false;
         }
 
         if (shutDown) {

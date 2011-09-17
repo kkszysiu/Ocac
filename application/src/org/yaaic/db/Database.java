@@ -76,7 +76,7 @@ public class Database extends SQLiteOpenHelper
             + ServerConstants.SASL_USERNAME + " TEXT, "
             + ServerConstants.SASL_PASSWORD + " TEXT"
             + ");"
-        );
+            );
 
         db.execSQL("CREATE TABLE " + ChannelConstants.TABLE_NAME + " ("
             + ChannelConstants._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
@@ -84,7 +84,7 @@ public class Database extends SQLiteOpenHelper
             + ChannelConstants.PASSWORD + " TEXT, "
             + ChannelConstants.SERVER + " INTEGER"
             + ");"
-        );
+            );
 
         db.execSQL("CREATE TABLE " + IdentityConstants.TABLE_NAME +" ("
             + IdentityConstants._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
@@ -92,21 +92,21 @@ public class Database extends SQLiteOpenHelper
             + IdentityConstants.IDENT + " TEXT NOT NULL,"
             + IdentityConstants.REALNAME + " TEXT NOT NULL"
             + ");"
-        );
+            );
 
         db.execSQL("CREATE TABLE " + CommandConstants.TABLE_NAME + " ("
             + CommandConstants._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + CommandConstants.COMMAND + " TEXT NOT NULL, "
             + ChannelConstants.SERVER + " INTEGER"
             + ");"
-        );
+            );
 
         db.execSQL("CREATE TABLE " + AliasConstants.TABLE_NAME + " ("
             + AliasConstants._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + AliasConstants.ALIAS + " TEXT NOT NULL, "
             + AliasConstants.IDENTITY + " INTEGER"
             + ");"
-        );
+            );
     }
 
     /**
@@ -137,7 +137,7 @@ public class Database extends SQLiteOpenHelper
                 + CommandConstants.COMMAND + " TEXT NOT NULL, "
                 + ChannelConstants.SERVER + " INTEGER"
                 + ");"
-            );
+                );
 
             oldVersion = 3;
         }
@@ -148,7 +148,7 @@ public class Database extends SQLiteOpenHelper
                 + AliasConstants.ALIAS + " TEXT NOT NULL, "
                 + AliasConstants.IDENTITY + " INTEGER"
                 + ");"
-            );
+                );
 
             oldVersion = 4;
         }
@@ -219,7 +219,7 @@ public class Database extends SQLiteOpenHelper
             values,
             ServerConstants._ID + " = " + serverId,
             null
-        );
+            );
     }
 
     /**
@@ -253,7 +253,7 @@ public class Database extends SQLiteOpenHelper
             ChannelConstants.TABLE_NAME,
             ChannelConstants.SERVER + " = " + serverId,
             null
-        );
+            );
 
         // Add new channels
         for (String channel : channels) {
@@ -279,7 +279,7 @@ public class Database extends SQLiteOpenHelper
             null,
             null,
             null
-        );
+            );
 
         while (cursor.moveToNext()) {
             String command = cursor.getString(cursor.getColumnIndex(CommandConstants.COMMAND));
@@ -320,7 +320,7 @@ public class Database extends SQLiteOpenHelper
             CommandConstants.TABLE_NAME,
             CommandConstants.SERVER + " = " + serverId,
             null
-        );
+            );
 
         // Add new commands
         for (String command : commands) {
@@ -333,7 +333,7 @@ public class Database extends SQLiteOpenHelper
      * 
      * @return
      */
-    public HashMap<Integer, Server> getServers()
+    public HashMap<Integer, Server> getServer()
     {
         HashMap<Integer, Server> servers = new HashMap<Integer, Server>();
 
@@ -345,7 +345,7 @@ public class Database extends SQLiteOpenHelper
             null,
             null,
             ServerConstants.TITLE + " ASC"
-        );
+            );
 
         while (cursor.moveToNext()) {
             Server server = populateServer(cursor);
@@ -368,7 +368,7 @@ public class Database extends SQLiteOpenHelper
             null,
             null,
             ServerConstants.TITLE + " ASC"
-        );
+            );
 
         if (cursor.moveToNext()) {
             server = populateServer(cursor);
@@ -397,7 +397,7 @@ public class Database extends SQLiteOpenHelper
             null,
             null,
             null
-        );
+            );
 
         if (cursor.moveToNext()) {
             isTitleUsed = true;
@@ -467,7 +467,7 @@ public class Database extends SQLiteOpenHelper
             null,
             null,
             ServerConstants.TITLE + " ASC"
-        );
+            );
     }
 
     /**
@@ -488,7 +488,7 @@ public class Database extends SQLiteOpenHelper
             null,
             null,
             ChannelConstants.NAME + " ASC"
-        );
+            );
 
         while (cursor.moveToNext()) {
             String channel = cursor.getString(cursor.getColumnIndex(ChannelConstants.NAME));
@@ -514,13 +514,13 @@ public class Database extends SQLiteOpenHelper
             deleteAliases(identityId);
             this.getWritableDatabase().execSQL(
                 "DELETE FROM " + IdentityConstants.TABLE_NAME + " WHERE " + IdentityConstants._ID + " = " + identityId + ";"
-            );
+                );
         }
 
         // Now delete the server entry
         this.getWritableDatabase().execSQL(
             "DELETE FROM " + ServerConstants.TABLE_NAME + " WHERE " + ServerConstants._ID + " = " + serverId + ";"
-        );
+            );
     }
 
     protected void setAliases(long identityId, List<String> aliases)
@@ -541,7 +541,7 @@ public class Database extends SQLiteOpenHelper
     {
         getWritableDatabase().execSQL(
             "DELETE FROM " + AliasConstants.TABLE_NAME + " WHERE " + AliasConstants.IDENTITY + " = " + identityId
-        );
+            );
     }
 
     protected List<String> getAliasesByIdentityId(long identityId)
@@ -556,7 +556,7 @@ public class Database extends SQLiteOpenHelper
             null,
             null,
             null
-        );
+            );
 
         while (cursor.moveToNext()) {
             aliases.add(cursor.getString(cursor.getColumnIndex(AliasConstants.ALIAS)));
@@ -611,7 +611,7 @@ public class Database extends SQLiteOpenHelper
             values,
             IdentityConstants._ID + " = " + identityId,
             null
-        );
+            );
 
         setAliases(identityId, aliases);
     }
@@ -634,7 +634,7 @@ public class Database extends SQLiteOpenHelper
             null,
             null,
             null
-        );
+            );
 
         if (cursor.moveToNext()) {
             identity = new Identity();
@@ -669,7 +669,7 @@ public class Database extends SQLiteOpenHelper
             null,
             null,
             null
-        );
+            );
 
         if (cursor.moveToNext()) {
             identityId = cursor.getInt(cursor.getColumnIndex(ServerConstants.IDENTITY));

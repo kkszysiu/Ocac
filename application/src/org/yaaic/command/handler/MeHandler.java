@@ -51,7 +51,7 @@ public class MeHandler extends BaseHandler
 
         if (params.length > 1) {
             String action = BaseHandler.mergeParams(params);
-            String nickname = service.getConnection(server.getId()).getNick();
+            String nickname = service.getConnection().getNick();
 
             Message message = new Message(nickname + " " + action);
             message.setIcon(R.drawable.action);
@@ -61,10 +61,10 @@ public class MeHandler extends BaseHandler
                 Broadcast.CONVERSATION_MESSAGE,
                 server.getId(),
                 conversation.getName()
-            );
+                );
             service.sendBroadcast(intent);
 
-            service.getConnection(server.getId()).sendAction(conversation.getName(), action);
+            service.getConnection().sendAction(conversation.getName(), action);
         } else {
             throw new CommandException(service.getString(R.string.text_missing));
         }

@@ -193,7 +193,7 @@ public class CommandParser
                     Broadcast.CONVERSATION_MESSAGE,
                     server.getId(),
                     conversation.getName()
-                );
+                    );
 
                 service.sendBroadcast(intent);
             }
@@ -212,11 +212,11 @@ public class CommandParser
     public void handleServerCommand(String type, String[] params, Server server, Conversation conversation, IRCService service)
     {
         if (params.length > 1) {
-            service.getConnection(server.getId()).sendRawLineViaQueue(
+            service.getConnection().sendRawLineViaQueue(
                 type.toUpperCase() + " " + BaseHandler.mergeParams(params)
-            );
+                );
         } else {
-            service.getConnection(server.getId()).sendRawLineViaQueue(type.toUpperCase());
+            service.getConnection().sendRawLineViaQueue(type.toUpperCase());
         }
     }
 

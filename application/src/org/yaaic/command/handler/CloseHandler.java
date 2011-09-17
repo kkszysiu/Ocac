@@ -52,7 +52,7 @@ public class CloseHandler extends BaseHandler
 
         if (params.length == 1) {
             if (conversation.getType() == Conversation.TYPE_CHANNEL) {
-                service.getConnection(server.getId()).partChannel(conversation.getName());
+                service.getConnection().partChannel(conversation.getName());
             }
             if (conversation.getType() == Conversation.TYPE_QUERY) {
                 server.removeConversation(conversation.getName());
@@ -61,7 +61,7 @@ public class CloseHandler extends BaseHandler
                     Broadcast.CONVERSATION_REMOVE,
                     server.getId(),
                     conversation.getName()
-                );
+                    );
                 service.sendBroadcast(intent);
             }
         }

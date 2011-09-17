@@ -44,7 +44,7 @@ public class AwayHandler extends BaseHandler
     @Override
     public void execute(String[] params, Server server, Conversation conversation, IRCService service) throws CommandException
     {
-        service.getConnection(server.getId()).sendRawLineViaQueue("AWAY " + BaseHandler.mergeParams(params));
+        service.getConnection().sendRawLineViaQueue("AWAY " + BaseHandler.mergeParams(params));
     }
 
     /**

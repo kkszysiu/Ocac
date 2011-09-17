@@ -47,7 +47,7 @@ public class VoiceHandler extends BaseHandler
         }
 
         if (params.length == 2) {
-            service.getConnection(server.getId()).voice(conversation.getName(), params[1]);
+            service.getConnection().voice(conversation.getName(), params[1]);
         } else {
             throw new CommandException(service.getString(R.string.invalid_number_of_params));
         }

@@ -43,9 +43,9 @@ public class QuitHandler extends BaseHandler
     public void execute(String[] params, Server server, Conversation conversation, IRCService service) throws CommandException
     {
         if (params.length == 1) {
-            service.getConnection(server.getId()).quitServer();
+            service.getConnection().quitServer();
         } else {
-            service.getConnection(server.getId()).quitServer(BaseHandler.mergeParams(params));
+            service.getConnection().quitServer(BaseHandler.mergeParams(params));
         }
     }
 

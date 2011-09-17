@@ -44,7 +44,7 @@ public class BackHandler extends BaseHandler
     @Override
     public void execute(String[] params, Server server, Conversation conversation, IRCService service) throws CommandException
     {
-        service.getConnection(server.getId()).sendRawLineViaQueue("AWAY");
+        service.getConnection().sendRawLineViaQueue("AWAY");
     }
 
     /**

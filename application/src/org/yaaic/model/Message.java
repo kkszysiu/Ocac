@@ -131,6 +131,7 @@ public class Message
      */
     public Message(String text, String sender, int type)
     {
+        text = text.replaceAll("%C(.*?)%", "");
         this.text = text;
         this.sender = sender;
         this.timestamp = new Date().getTime();
@@ -239,7 +240,7 @@ public class Message
             } else {
                 renderedText = new SpannableString(
                     MircColors.removeStyleAndColors(text)
-                );
+                    );
             }
 
             if (settings.showGraphicalSmilies()) {

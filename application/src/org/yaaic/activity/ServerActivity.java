@@ -20,15 +20,11 @@ along with Yaaic.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.yaaic.activity;
 
-import java.util.ArrayList;
-
 import org.yaaic.R;
 import org.yaaic.Yaaic;
 import org.yaaic.adapter.ServerListAdapter;
-import org.yaaic.db.Database;
 import org.yaaic.irc.IRCBinder;
 import org.yaaic.irc.IRCService;
-import org.yaaic.layout.NonScalingBackgroundDrawable;
 import org.yaaic.listener.ServerListener;
 import org.yaaic.model.Broadcast;
 import org.yaaic.model.Extra;
@@ -36,10 +32,8 @@ import org.yaaic.model.Server;
 import org.yaaic.model.Status;
 import org.yaaic.receiver.ServerReceiver;
 
-import android.app.AlertDialog;
-import android.app.ListActivity;
+import android.app.Activity;
 import android.content.ComponentName;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
@@ -48,22 +42,18 @@ import android.os.IBinder;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.Toast;
-import android.widget.AdapterView.OnItemLongClickListener;
 
 /**
  * List of servers
  * 
  * @author Sebastian Kaspari <sebastian@yaaic.org>
  */
-public class ServersActivity extends ListActivity implements ServiceConnection, ServerListener, OnItemLongClickListener {
+public class ServerActivity extends Activity implements ServiceConnection, ServerListener {
     private IRCBinder binder;
     private ServerReceiver receiver;
     private ServerListAdapter adapter;
-    private ListView list;
+    //private ListView list;
     private static int instanceCount = 0;
 
     /**
@@ -86,14 +76,14 @@ public class ServersActivity extends ListActivity implements ServiceConnection, 
             finish();
         }
         instanceCount++;
-        setContentView(R.layout.servers);
+        setContentView(R.layout.server);
 
         adapter = new ServerListAdapter();
-        setListAdapter(adapter);
+        ///setListAdapter(adapter);
 
-        list = getListView();
-        list.setOnItemLongClickListener(this);
-        list.setBackgroundDrawable(new NonScalingBackgroundDrawable(this, list, R.drawable.background));
+        //list = getListView();
+        //list.setOnItemLongClickListener(this);
+        //list.setBackgroundDrawable(new NonScalingBackgroundDrawable(this, list, R.drawable.background));
     }
 
     /**
@@ -163,6 +153,7 @@ public class ServersActivity extends ListActivity implements ServiceConnection, 
     /**
      * On server selected
      */
+    /*
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
         Server server = adapter.getItem(position);
@@ -183,10 +174,12 @@ public class ServersActivity extends ListActivity implements ServiceConnection, 
         intent.putExtra("serverId", server.getId());
         startActivity(intent);
     }
+     */
 
     /**
      * On long click
      */
+    /*
     @Override
     public boolean onItemLongClick(AdapterView<?> l, View v, int position, long id)
     {
@@ -237,22 +230,24 @@ public class ServersActivity extends ListActivity implements ServiceConnection, 
         alert.show();
         return true;
     }
+     */
+
 
     /**
      * Start activity to edit server with given id
      * 
      * @param serverId The id of the server
      */
-    private void editServer(int serverId)
+    private void editServer()
     {
-        Server server = Yaaic.getInstance().getServerById(serverId);
+        Server server = Yaaic.getInstance().getServer();
 
         if (server.getStatus() != Status.DISCONNECTED) {
             Toast.makeText(this, getResources().getString(R.string.disconnect_before_editing), Toast.LENGTH_SHORT).show();
         }
         else {
             Intent intent = new Intent(this, AddServerActivity.class);
-            intent.putExtra(Extra.SERVER, serverId);
+            intent.putExtra(Extra.SERVER, 0);
             startActivityForResult(intent, 0);
         }
     }
@@ -280,7 +275,17 @@ public class ServersActivity extends ListActivity implements ServiceConnection, 
     {
         switch (item.getItemId()) {
             case R.id.add:
-                startActivityForResult(new Intent(this, AddServerActivity.class), 0);
+                final Server server = Yaaic.getInstance().getServer();
+                //startActivityForResult(new Intent(this, AddServerActivity.class), 0);
+                Intent intent = new Intent(this, ConversationActivity.class);
+
+                if (server.getStatus() == Status.DISCONNECTED && !server.mayReconnect()) {
+                    server.setStatus(Status.PRE_CONNECTING);
+                    intent.putExtra("connect", true);
+                }
+
+                intent.putExtra("serverId", 0);
+                startActivity(intent);
                 break;
             case R.id.about:
                 startActivity(new Intent(this, AboutActivity.class));
@@ -289,14 +294,13 @@ public class ServersActivity extends ListActivity implements ServiceConnection, 
                 startActivity(new Intent(this, SettingsActivity.class));
                 break;
             case R.id.exit:
-                ArrayList<Server> mServers = Yaaic.getInstance().getServersAsArrayList();
-                for (Server server : mServers) {
-                    if (binder.getService().hasConnection(server.getId())) {
-                        server.setStatus(Status.DISCONNECTED);
-                        server.setMayReconnect(false);
-                        binder.getService().getConnection(server.getId()).quitServer();
-                    }
-                }
+                Server mServer = Yaaic.getInstance().getServer();
+
+                mServer.setStatus(Status.DISCONNECTED);
+                mServer.setMayReconnect(false);
+                binder.getService().getConnection().quitServer();
+
+
                 // ugly
                 binder.getService().stopForegroundCompat(R.string.app_name);
                 finish();
@@ -324,11 +328,6 @@ public class ServersActivity extends ListActivity implements ServiceConnection, 
      */
     public void deleteServer(int serverId)
     {
-        Database db = new Database(this);
-        db.removeServerById(serverId);
-        db.close();
-
-        Yaaic.getInstance().removeServerById(serverId);
         adapter.loadServers();
     }
 
@@ -342,7 +341,7 @@ public class ServersActivity extends ListActivity implements ServiceConnection, 
 
         if (adapter.getCount() > 2) {
             // Hide background if there are servers in the list
-            list.setBackgroundDrawable(null);
+            //list.setBackgroundDrawable(null);
         }
     }
 

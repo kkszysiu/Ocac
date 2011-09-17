@@ -53,10 +53,10 @@ public class TopicHandler extends BaseHandler
 
         if (params.length == 1) {
             // Show topic
-            service.getConnection(server.getId()).onTopic(channel.getName(), channel.getTopic(), "", 0, false);
+            service.getConnection().onTopic(channel.getName(), channel.getTopic(), "", 0, false);
         } else if (params.length > 1) {
             // Change topic
-            service.getConnection(server.getId()).setTopic(channel.getName(), BaseHandler.mergeParams(params));
+            service.getConnection().setTopic(channel.getName(), BaseHandler.mergeParams(params));
         }
     }
 

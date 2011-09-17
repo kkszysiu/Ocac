@@ -47,7 +47,7 @@ public class ModeHandler extends BaseHandler
         if (params.length > 2) {
             String modes = BaseHandler.mergeParams(params, 2);
 
-            service.getConnection(server.getId()).setMode(params[1], modes);
+            service.getConnection().setMode(params[1], modes);
         } else {
             throw new CommandException(service.getString(R.string.invalid_number_of_params));
         }

@@ -58,10 +58,10 @@ public class NoticeHandler extends BaseHandler
                 Broadcast.CONVERSATION_MESSAGE,
                 server.getId(),
                 conversation.getName()
-            );
+                );
             service.sendBroadcast(intent);
 
-            service.getConnection(server.getId()).sendNotice(params[1], text);
+            service.getConnection().sendNotice(params[1], text);
         } else {
             throw new CommandException(service.getString(R.string.invalid_number_of_params));
         }

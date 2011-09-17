@@ -1,4 +1,4 @@
-/* 
+/*
 Copyright Paul James Mutton, 2001-2007, http://www.jibble.org/
 
 This file is part of PircBot.
@@ -9,12 +9,12 @@ Since the GPL may be too restrictive for use in a proprietary application,
 a commercial license is also provided. Full license information can be
 found at http://www.jibble.org/licenses/
 
-*/
+ */
 
 
 package org.jibble.pircbot;
 
-import java.io.*;
+import java.io.BufferedWriter;
 
 /**
  * A Thread which is responsible for sending messages to the IRC server.
@@ -28,8 +28,8 @@ import java.io.*;
  * @version    1.4.6 (Build time: Wed Apr 11 19:20:59 2007)
  */
 public class OutputThread extends Thread {
-    
-    
+
+
     /**
      * Constructs an OutputThread for the underlying PircBot.  All messages
      * sent to the IRC server are sent by this OutputThread to avoid hammering
@@ -44,8 +44,8 @@ public class OutputThread extends Thread {
         _outQueue = outQueue;
         this.setName(this.getClass() + "-Thread");
     }
-    
-    
+
+
     /**
      * A static method to write a line to a BufferedOutputStream and then pass
      * the line to the log method of the supplied PircBot instance.
@@ -70,19 +70,20 @@ public class OutputThread extends Thread {
             }
         }
     }
-    
-    
+
+
     /**
      * This method starts the Thread consuming from the outgoing message
      * Queue and sending lines to the server.
      */
+    @Override
     public void run() {
         try {
             boolean running = true;
             while (running) {
                 // Small delay to prevent spamming of the channel
                 Thread.sleep(_bot.getMessageDelay());
-                
+
                 String line = (String) _outQueue.next();
                 if (line != null) {
                     _bot.sendRawLine(line);
@@ -96,8 +97,8 @@ public class OutputThread extends Thread {
             // Just let the method return naturally...
         }
     }
-    
+
     private PircBot _bot = null;
     private Queue _outQueue = null;
-    
+
 }

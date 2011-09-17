@@ -38,8 +38,11 @@ import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.X509TrustManager;
 
+import org.yaaic.model.OnetAuth;
 import org.yaaic.ssl.NaiveTrustManager;
 import org.yaaic.tools.Base64;
+
+import android.util.Log;
 
 /**
  * PircBot is a Java framework for writing IRC bots quickly and easily.
@@ -87,6 +90,9 @@ public abstract class PircBot implements ReplyConstants {
     private static final int OP_REMOVE = 2;
     private static final int VOICE_ADD = 3;
     private static final int VOICE_REMOVE = 4;
+
+    public static String uoKey = "";
+    public static String authKey = "";
 
     /**
      * Constructs a PircBot with the default settings.  Your own constructors
@@ -228,8 +234,7 @@ public abstract class PircBot implements ReplyConstants {
             }
         }
 
-        OutputThread.sendRawLine(this, bwriter, "NICK " + nick);
-        OutputThread.sendRawLine(this, bwriter, "USER " + this.getLogin() + " 8 * :" + this.getVersion());
+        OutputThread.sendRawLine(this, bwriter, "AUTHKEY");
 
         _inputThread = new InputThread(this, _socket, breader, bwriter);
 
@@ -337,6 +342,10 @@ public abstract class PircBot implements ReplyConstants {
         _autoNickChange = autoNickChange;
     }
 
+    public void setUOKey(String uoKey) {
+        this.uoKey = uoKey;
+    }
+
     /**
      * Joins a channel.
      * 
@@ -409,8 +418,13 @@ public abstract class PircBot implements ReplyConstants {
      * outgoing message queue.
      *
      * @param line The raw line to send to the IRC server.
+     * @throws UnsupportedEncodingException
      */
     public final synchronized void sendRawLine(String line) {
+        Log.i("PircBot", "sendRawLine: " + line);
+        //byte[] latin1 = line.getBytes(Charset.defaultCharset().displayName());
+        //byte[] utf8 = new String(latin1, "ISO-8859-1").getBytes("UTF-8");
+        //encodedLine = new String(latin1, "ISO-8859-2");
         if (isConnected()) {
             _inputThread.sendRawLine(line);
         }
@@ -893,6 +907,7 @@ public abstract class PircBot implements ReplyConstants {
         String senderInfo = tokenizer.nextToken();
         String command = tokenizer.nextToken();
         String target = null;
+        Log.i("PircBot", "Handle senderInfo: "+senderInfo+", command: "+command+", target: "+target);
 
         int exclamation = senderInfo.indexOf("!");
         int at = senderInfo.indexOf("@");
@@ -946,6 +961,13 @@ public abstract class PircBot implements ReplyConstants {
                                 _inputThread = null;
                                 throw new NickAlreadyInUseException(line);
                             }
+                        } else if (code == 801) {
+                            String onetAuthKey = response.substring(response.indexOf(":") + 1);
+                            authKey = OnetAuth.generateAuthKey(onetAuthKey);
+
+                            this.sendRawLine("NICK " + this.getLogin());
+                            this.sendRawLine("USER * " + this.uoKey + " czat-app.onet.pl :" + this.getLogin());
+                            this.sendRawLine("AUTHKEY " + authKey);
                         }
 
                         return;
@@ -2718,7 +2740,9 @@ public abstract class PircBot implements ReplyConstants {
         // Just try to see if the charset is supported first...
         "".getBytes(charset);
 
-        _charset = charset;
+        this._charset = charset;
+        //        this.charset = Charset.forName(charset);
+        //        this.charsetDecoder = this.charset.newDecoder();
     }
 
 
@@ -2882,10 +2906,10 @@ public abstract class PircBot implements ReplyConstants {
     @Override
     public String toString() {
         return "Version{" + _version + "}" +
-        " Connected{" + isConnected() + "}" +
-        " Server{" + _server + "}" +
-        " Port{" + _port + "}" +
-        " Password{" + _password + "}";
+            " Connected{" + isConnected() + "}" +
+            " Server{" + _server + "}" +
+            " Port{" + _port + "}" +
+            " Password{" + _password + "}";
     }
 
 
@@ -3138,7 +3162,12 @@ public abstract class PircBot implements ReplyConstants {
     // Connection stuff.
     private InputThread _inputThread = null;
     private OutputThread _outputThread = null;
-    private String _charset = null;
+    private String _charset = "ISO-8859-2";
+    //    private final Charset charsetOrig = Charset.defaultCharset();
+    //    private final CharsetEncoder encoderOrig = charsetOrig.newEncoder();
+    //    private String _charset = null;
+    //    private Charset charset = Charset.forName(_charset);
+    //    private CharsetDecoder charsetDecoder = charset.newDecoder();
     private InetAddress _inetAddress = null;
     private Socket _socket = null;
 

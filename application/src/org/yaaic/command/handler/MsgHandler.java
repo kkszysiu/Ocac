@@ -49,19 +49,19 @@ public class MsgHandler extends BaseHandler
     {
         if (params.length > 2) {
             String text = BaseHandler.mergeParams(params, 2);
-            service.getConnection(server.getId()).sendMessage(params[1], text);
+            service.getConnection().sendMessage(params[1], text);
 
             Conversation targetConversation = server.getConversation(params[1]);
 
             if (targetConversation != null) {
-                Message message = new Message("<" + service.getConnection(server.getId()).getNick() + "> " + text);
+                Message message = new Message("<" + service.getConnection().getNick() + "> " + text);
                 targetConversation.addMessage(message);
 
                 Intent intent = Broadcast.createConversationIntent(
                     Broadcast.CONVERSATION_MESSAGE,
                     server.getId(),
                     targetConversation.getName()
-                );
+                    );
 
                 service.sendBroadcast(intent);
             }

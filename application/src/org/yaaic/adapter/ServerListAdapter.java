@@ -20,8 +20,6 @@ along with Yaaic.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.yaaic.adapter;
 
-import java.util.ArrayList;
-
 import org.yaaic.R;
 import org.yaaic.Yaaic;
 import org.yaaic.model.Server;
@@ -44,7 +42,7 @@ public class ServerListAdapter extends BaseAdapter
     private static final int COLOR_CONNECTED    = 0xFFbcbcbc;
     private static final int COLOR_DISCONNECTED = 0xFF585858;
 
-    private ArrayList<Server> servers;
+    private Server server;
 
     /**
      * Create a new adapter for server lists
@@ -61,7 +59,7 @@ public class ServerListAdapter extends BaseAdapter
      */
     public void loadServers()
     {
-        servers = Yaaic.getInstance().getServersAsArrayList();
+        server = Yaaic.getInstance().getServer();
         notifyDataSetChanged();
     }
 
@@ -71,14 +69,7 @@ public class ServerListAdapter extends BaseAdapter
     @Override
     public int getCount()
     {
-        int size = servers.size();
-
-        // Display "Add server" item
-        if (size == 0) {
-            return 1;
-        }
-
-        return size;
+        return 1;
     }
 
     /**
@@ -89,11 +80,7 @@ public class ServerListAdapter extends BaseAdapter
     @Override
     public Server getItem(int position)
     {
-        if (servers.size() == 0) {
-            return null; // No server object for the "add server" view
-        }
-
-        return servers.get(position);
+        return server;
     }
 
     /**
@@ -104,11 +91,7 @@ public class ServerListAdapter extends BaseAdapter
     @Override
     public long getItemId(int position)
     {
-        if (servers.size() == 0) {
-            return 0;
-        }
-
-        return getItem(position).getId();
+        return 0;
     }
 
     /**

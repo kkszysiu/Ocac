@@ -46,7 +46,7 @@ public class RawHandler extends BaseHandler
     {
         if (params.length > 1) {
             String line = BaseHandler.mergeParams(params);
-            service.getConnection(server.getId()).sendRawLineViaQueue(line);
+            service.getConnection().sendRawLineViaQueue(line);
         } else {
             throw new CommandException(service.getString(R.string.line_missing));
         }

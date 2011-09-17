@@ -53,7 +53,7 @@ public class NamesHandler extends BaseHandler
 
         StringBuffer userList = new StringBuffer(service.getString(R.string.message_users_on_chan, conversation.getName()));
 
-        User[] mUsers = service.getConnection(server.getId()).getUsers(conversation.getName());
+        User[] mUsers = service.getConnection().getUsers(conversation.getName());
         int mSize = mUsers.length;
         for (int i = 0; i < mSize; i++) {
             userList.append(" ");
@@ -69,7 +69,7 @@ public class NamesHandler extends BaseHandler
             Broadcast.CONVERSATION_MESSAGE,
             server.getId(),
             conversation.getName()
-        );
+            );
         service.sendBroadcast(intent);
     }
 

@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 import org.yaaic.R;
-import org.yaaic.Yaaic;
 import org.yaaic.db.Database;
 import org.yaaic.exception.ValidationException;
 import org.yaaic.model.Authentication;
@@ -261,7 +260,7 @@ public class AddServerActivity extends Activity implements OnClickListener
         server.setAutoJoinChannels(channels);
         server.setConnectCommands(commands);
 
-        Yaaic.getInstance().addServer(server);
+        //Yaaic.getInstance().addServer(server);
     }
 
     /**
@@ -297,7 +296,7 @@ public class AddServerActivity extends Activity implements OnClickListener
         server.setAutoJoinChannels(channels);
         server.setConnectCommands(commands);
 
-        Yaaic.getInstance().updateServer(server);
+        //Yaaic.getInstance().updateServer(server);
     }
 
     /**
